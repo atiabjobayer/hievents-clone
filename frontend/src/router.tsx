@@ -576,6 +576,14 @@ export const router: RouteObject[] = [
         ]
     },
     {
+        path: "/checkout/bkash/return",
+        async lazy() {
+            const BkashReturn = await import("./components/routes/product-widget/BkashReturn");
+            return { Component: BkashReturn.default };
+        },
+        errorElement: <ErrorPage />,
+    },
+    {
         path: "/order/:eventId/:orderShortId/print",
         async lazy() {
             const PrintOrder = await import("./components/routes/product-widget/PrintOrder");

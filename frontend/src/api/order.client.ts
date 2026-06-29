@@ -168,6 +168,25 @@ export const orderClientPublic = {
         return response.data;
     },
 
+    createBkashPayment: async (eventId: number, orderShortId: string) => {
+        const response = await publicApi.post<{
+            payment_id: string,
+            merchant_invoice_number: string,
+            transaction_status: string,
+            hash: string,
+        }>(`events/${eventId}/order/${orderShortId}/bkash/create`);
+        return response.data;
+    },
+
+    getBkashPaymentStatus: async (eventId: number, orderShortId: string) => {
+        return await publicApi.get<{
+            payment_id: string,
+            transaction_status: string,
+            trx_id?: string,
+            amount: number,
+        }>(`events/${eventId}/order/${orderShortId}/bkash/status`);
+    },
+
     downloadInvoice: async (eventId: IdParam, orderShortId: IdParam): Promise<Blob> => {
         const response = await publicApi.get(`events/${eventId}/order/${orderShortId}/invoice`, {
             responseType: 'blob',

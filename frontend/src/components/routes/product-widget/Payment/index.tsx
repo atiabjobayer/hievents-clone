@@ -4,6 +4,7 @@ import {useGetEventPublic} from "../../../../queries/useGetEventPublic.ts";
 import {CheckoutContent} from "../../../layouts/Checkout/CheckoutContent";
 import {StripePaymentMethod} from "./PaymentMethods/Stripe";
 import {OfflinePaymentMethod} from "./PaymentMethods/Offline";
+import {BkashPaymentMethod} from "./PaymentMethods/Bkash";
 import {Event} from "../../../../types.ts";
 import {Button, Group, Text} from "@mantine/core";
 import {IconBuildingBank, IconLock, IconWallet} from "@tabler/icons-react";
@@ -27,23 +28,25 @@ const Payment = () => {
     const {data: order, isFetched: isOrderFetched} = useGetOrderPublic(eventId, orderShortId, ['event']);
     const isLoading = !isOrderFetched;
     const [isPaymentLoading, setIsPaymentLoading] = useState(false);
-    const [activePaymentMethod, setActivePaymentMethod] = useState<'STRIPE' | 'OFFLINE' | null>(null);
+    const [activePaymentMethod, setActivePaymentMethod] = useState<'STRIPE' | 'OFFLINE' | 'BKASH' | null>(null);
     const [submitHandler, setSubmitHandler] = useState<(() => Promise<void>) | null>(null);
     const transitionOrderToOfflinePaymentMutation = useTransitionOrderToOfflinePaymentPublic();
 
     const isStripeEnabled = event?.settings?.payment_providers?.includes('STRIPE');
     const isOfflineEnabled = event?.settings?.payment_providers?.includes('OFFLINE');
+    const isBkashEnabled = event?.settings?.payment_providers?.includes('BKASH');
 
     React.useEffect(() => {
-        // Automatically set the first available payment method
         if (isStripeEnabled) {
             setActivePaymentMethod('STRIPE');
+        } else if (isBkashEnabled) {
+            setActivePaymentMethod('BKASH');
         } else if (isOfflineEnabled) {
             setActivePaymentMethod('OFFLINE');
         } else {
-            setActivePaymentMethod(null); // No methods available
+            setActivePaymentMethod(null);
         }
-    }, [isStripeEnabled, isOfflineEnabled]);
+    }, [isStripeEnabled, isOfflineEnabled, isBkashEnabled]);
 
     React.useEffect(() => {
         // Scroll to top when payment page loads
@@ -80,7 +83,7 @@ const Payment = () => {
         }
     };
 
-    if (!isStripeEnabled && !isOfflineEnabled && isOrderFetched && isEventFetched) {
+    if (!isStripeEnabled && !isOfflineEnabled && !isBkashEnabled && isOrderFetched && isEventFetched) {
         return (
             <CheckoutContent>
                 <Card>
@@ -89,6 +92,8 @@ const Payment = () => {
             </CheckoutContent>
         );
     }
+
+    const paymentMethodsCount = (isStripeEnabled ? 1 : 0) + (isOfflineEnabled ? 1 : 0) + (isBkashEnabled ? 1 : 0);
 
     return (
         <>
@@ -108,32 +113,53 @@ const Payment = () => {
                     </div>
                 )}
 
-                {(isStripeEnabled && isOfflineEnabled) && (
+                {isBkashEnabled && (
+                    <div style={{display: activePaymentMethod === 'BKASH' ? 'block' : 'none'}}>
+                        <BkashPaymentMethod enabled={true} />
+                    </div>
+                )}
+
+                {paymentMethodsCount > 1 && (
                     <div className={classes.paymentMethodSelector}>
                         <Text size="sm" c="dimmed" className={classes.paymentMethodLabel}>
                             {t`Payment method`}
                         </Text>
                         <div className={classes.paymentMethodTabs}>
-                            <button
-                                type="button"
-                                className={`${classes.paymentMethodTab} ${activePaymentMethod === 'STRIPE' ? classes.active : ''}`}
-                                onClick={() => setActivePaymentMethod('STRIPE')}
-                            >
-                                <IconWallet size={18}/>
-                                <span>{t`Online`}</span>
-                            </button>
-                            <button
-                                type="button"
-                                className={`${classes.paymentMethodTab} ${activePaymentMethod === 'OFFLINE' ? classes.active : ''}`}
-                                onClick={() => setActivePaymentMethod('OFFLINE')}
-                            >
-                                <IconBuildingBank size={18}/>
-                                <span>{t`Offline`}</span>
-                            </button>
+                            {isStripeEnabled && (
+                                <button
+                                    type="button"
+                                    className={`${classes.paymentMethodTab} ${activePaymentMethod === 'STRIPE' ? classes.active : ''}`}
+                                    onClick={() => setActivePaymentMethod('STRIPE')}
+                                >
+                                    <IconWallet size={18}/>
+                                    <span>{t`Online`}</span>
+                                </button>
+                            )}
+                            {isBkashEnabled && (
+                                <button
+                                    type="button"
+                                    className={`${classes.paymentMethodTab} ${activePaymentMethod === 'BKASH' ? classes.active : ''}`}
+                                    onClick={() => setActivePaymentMethod('BKASH')}
+                                >
+                                    <IconWallet size={18}/>
+                                    <span>bKash</span>
+                                </button>
+                            )}
+                            {isOfflineEnabled && (
+                                <button
+                                    type="button"
+                                    className={`${classes.paymentMethodTab} ${activePaymentMethod === 'OFFLINE' ? classes.active : ''}`}
+                                    onClick={() => setActivePaymentMethod('OFFLINE')}
+                                >
+                                    <IconBuildingBank size={18}/>
+                                    <span>{t`Offline`}</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
 
+                {activePaymentMethod !== 'BKASH' && (
                 <div className={classes.checkoutActions}>
                     <Button
                         className={classes.continueButton}
@@ -162,6 +188,7 @@ const Payment = () => {
                         </p>
                     )}
                 </div>
+                )}
             </CheckoutContent>
         </>
     );

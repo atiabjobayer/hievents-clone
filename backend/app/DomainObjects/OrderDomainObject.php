@@ -27,6 +27,8 @@ class OrderDomainObject extends Generated\OrderDomainObjectAbstract implements I
 
     public ?StripePaymentDomainObject $stripePayment = null;
 
+    public ?BkashPaymentDomainObject $bkashPayment = null;
+
     /** @var Collection<QuestionAndAnswerViewDomainObject>|null */
     public ?Collection $questionAndAnswerViews = null;
 
@@ -183,6 +185,12 @@ class OrderDomainObject extends Generated\OrderDomainObjectAbstract implements I
         return $this;
     }
 
+    public function setBkashPayment(?BkashPaymentDomainObject $bkashPayment): OrderDomainObject
+    {
+        $this->bkashPayment = $bkashPayment;
+        return $this;
+    }
+
     public function isPartiallyRefunded(): bool
     {
         return $this->getTotalRefunded() > 0 && $this->getTotalRefunded() < $this->getTotalGross();
@@ -216,6 +224,11 @@ class OrderDomainObject extends Generated\OrderDomainObjectAbstract implements I
     public function getLatestInvoice(): ?InvoiceDomainObject
     {
         return $this->getInvoices()?->sortByDesc(fn(InvoiceDomainObject $invoice) => $invoice->getId())->first();
+    }
+
+    public function getBkashPayment(): ?BkashPaymentDomainObject
+    {
+        return $this->bkashPayment;
     }
 
     public function getStripePayment(): ?StripePaymentDomainObject

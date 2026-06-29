@@ -1,0 +1,24 @@
+.container {
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+.bkashInfo {
+    margin-bottom: 1.5rem;
+}
+
+.icon {
+    color: #E2136E;
+    margin: 0 auto;
+}
+
+.payButton {
+    background-color: #E2136E;
+    border-color: #E2136E;
+    color: white;
+
+    &:hover {
+        background-color: #c4105e;
+        border-color: #c4105e;
+    }
+}

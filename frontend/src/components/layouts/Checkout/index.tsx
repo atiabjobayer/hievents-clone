@@ -108,19 +108,17 @@ const Checkout = () => {
             });
         } catch (error) {
             showError(t`Failed to abandon order. Please try again.`);
-        } finally {
-            setShowAbandonDialog(false);
-            showInfo(t`Your order has been cancelled.`);
-
-            if (blocker.state === 'blocked') {
-                blocker.proceed();
-            } else if (pendingNavigation) {
-                navigate(pendingNavigation);
-            }
-
-            setPendingNavigation(null);
             setIsAbandoning(false);
+            return;
         }
+
+        setShowAbandonDialog(false);
+        showInfo(t`Your order has been cancelled.`);
+
+        // Full page reload is the most reliable way to exit checkout after abandon
+        const target = pendingNavigation
+            || (event ? eventHomepagePath(event) : '/');
+        window.location.href = target;
     };
 
     const handleAbandonCancel = () => {

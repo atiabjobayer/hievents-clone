@@ -21,6 +21,11 @@ class Order extends BaseModel
         return $this->hasOne(StripePayment::class);
     }
 
+    public function bkash_payment(): HasOne
+    {
+        return $this->hasOne(BkashPayment::class);
+    }
+
     public function order_items(): HasMany
     {
         return $this->hasMany(OrderItem::class);

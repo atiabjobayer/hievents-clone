@@ -83,7 +83,12 @@ export const PaymentAndInvoicingSettings = () => {
         {
             value: "STRIPE",
             label: t`Stripe`,
-            description: t`Accept credit card payments with Stripe`
+            description: t`Accept credit and debit card payments with Stripe`
+        },
+        {
+            value: "BKASH",
+            label: t`bKash`,
+            description: t`Accept mobile wallet payments via bKash (Bangladesh)`
         },
         {
             value: "OFFLINE",

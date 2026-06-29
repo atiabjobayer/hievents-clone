@@ -21,6 +21,7 @@ import {
     IconSend,
     IconTicket,
     IconTrash,
+    IconWallet,
     IconX
 } from "@tabler/icons-react";
 import {relativeDate} from "../../../utilites/dates.ts";
@@ -382,6 +383,11 @@ export const OrdersTable = ({orders, event}: OrdersTableProps) => {
                                 <>
                                     <IconCreditCard size={16}/>
                                     <Text>{t`Stripe`}</Text>
+                                </>
+                            ) : order.payment_provider === 'BKASH' ? (
+                                <>
+                                    <IconWallet size={16}/>
+                                    <Text>bKash</Text>
                                 </>
                             ) : order.payment_provider === 'OFFLINE' ? (
                                 <>

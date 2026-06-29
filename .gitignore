@@ -20,3 +20,10 @@ prompts/
 
 /plans/**
 /plans
+
+localhost.crt
+localhost.key
+docs
+bkash-api-docs
+sandbox-cred-checkout.json
+pgw-merchant-backend-php

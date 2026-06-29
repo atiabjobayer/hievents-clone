@@ -92,6 +92,10 @@ use HiEvents\Http\Actions\Orders\GetOrdersAction;
 use HiEvents\Http\Actions\Orders\MarkOrderAsPaidAction;
 use HiEvents\Http\Actions\Orders\MessageOrderAction;
 use HiEvents\Http\Actions\Orders\Payment\RefundOrderAction;
+use HiEvents\Http\Actions\Orders\Payment\Bkash\CreateBkashPaymentActionPublic;
+use HiEvents\Http\Actions\Orders\Payment\Bkash\BkashCallbackActionPublic;
+use HiEvents\Http\Actions\Orders\Payment\Bkash\GetBkashPaymentStatusActionPublic;
+use HiEvents\Http\Actions\Orders\Payment\Bkash\ExecuteBkashPaymentActionPublic;
 use HiEvents\Http\Actions\Orders\Payment\Stripe\CreatePaymentIntentActionPublic;
 use HiEvents\Http\Actions\Orders\Payment\Stripe\GetPaymentIntentActionPublic;
 use HiEvents\Http\Actions\Orders\Public\AbandonOrderActionPublic;
@@ -527,11 +531,19 @@ $router->prefix('/public')->group(
         $router->post('/events/{event_id}/order/{order_short_id}/stripe/payment_intent', CreatePaymentIntentActionPublic::class);
         $router->get('/events/{event_id}/order/{order_short_id}/stripe/payment_intent', GetPaymentIntentActionPublic::class);
 
+        // bKash payment gateway
+        $router->post('/events/{event_id}/order/{order_short_id}/bkash/create', CreateBkashPaymentActionPublic::class);
+        $router->get('/events/{event_id}/order/{order_short_id}/bkash/status', GetBkashPaymentStatusActionPublic::class);
+
         // Questions
         $router->get('/events/{event_id}/questions', GetQuestionsPublicAction::class);
 
         // Webhooks
         $router->post('/webhooks/stripe', StripeIncomingWebhookAction::class);
+        $router->get('/webhooks/bkash/callback', BkashCallbackActionPublic::class);
+        $router->post('/webhooks/bkash/callback', BkashCallbackActionPublic::class);
+        $router->post('/webhooks/bkash/execute', ExecuteBkashPaymentActionPublic::class)
+            ->middleware('throttle:10,1');
 
         // Check-In
         $router->get('/check-in-lists/{check_in_list_short_id}', GetCheckInListPublicAction::class);
